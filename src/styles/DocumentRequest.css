@@ -1,0 +1,102 @@
+.document-request-container {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.document-request-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .document-request-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.section-icon {
+  font-size: 32px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 32px;
+  color: var(--primary-color);
+  font-family: "Bebas Neue", cursive;
+  letter-spacing: 2px;
+}
+
+.total-price {
+  background-color: var(--secondary-color);
+  padding: 16px;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 16px;
+  color: var(--dark-color);
+  font-size: 18px;
+  font-weight: 700;
+  font-family: "Montserrat", sans-serif;
+}
+
+.requests-list-section h2 {
+  margin: 0 0 16px 0;
+  font-size: 32px;
+  color: var(--primary-color);
+  font-family: "Bebas Neue", cursive;
+  letter-spacing: 2px;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--gray-medium);
+  padding: 40px 20px;
+  font-family: "Montserrat", sans-serif;
+}
+
+.requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.request-item {
+  padding: 20px;
+}
+
+.request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.request-header h3 {
+  margin: 0;
+  font-size: 24px;
+  color: var(--dark-color);
+  font-family: "Bebas Neue", cursive;
+  letter-spacing: 1px;
+}
+
+.request-details p {
+  margin: 8px 0;
+  color: var(--gray-dark);
+  font-size: 14px;
+  font-family: "Montserrat", sans-serif;
+}
+
+.request-date {
+  color: var(--gray-medium);
+  font-size: 12px;
+  margin-top: 12px;
+  font-family: "Montserrat", sans-serif;
+}
