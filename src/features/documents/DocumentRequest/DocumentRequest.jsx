@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/DocumentRequest.css';
+import './DocumentRequest.css';
 
 const documentTypes = [
   { value: 'transcript', label: 'Transcript of Records', price: 150 },
