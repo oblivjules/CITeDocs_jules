@@ -1,67 +1,89 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import Login from './components/Login';
-import Register from './components/Register';
-import DocumentRequest from './components/DocumentRequest';
-import AdminPortal from './components/AdminPortal';
-import ClaimSlip from './components/ClaimSlip';
+import StudentLogin from './features/auth/Login/StudentLogin';
+import RegistrarLogin from './features/auth/Login/RegistrarLogin';
+import StudentRegister from './features/auth/Register/StudentRegister';
+import RegistrarRegister from './features/auth/Register/RegistrarRegister';
+import DocumentRequest from './features/documents/DocumentRequest/DocumentRequest';
+import RegistrarPortal from './features/documents/RegistrarPortal/RegistrarPortal';
+import ClaimSlip from './features/documents/ClaimSlip/ClaimSlip';
+import StudentPortal from './features/documents/StudentPortal/StudentPortal';
+import { AuthProvider, useAuthContext } from './features/auth/context/AuthContext';
 import './styles/common.css';
 
-function App() {
-  const [user, setUser] = useState(null);
-  const [showRegister, setShowRegister] = useState(false);
-
-  const handleLogin = (userData) => {
-    setUser(userData);
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-  };
+function AppContent() {
+  const { user } = useAuthContext();
 
   return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <main style={{ flex: 1 }}>
+        <Routes>
+  {/* Default redirect */}
+  <Route
+    path="/"
+    element={
+      !user ? (
+        <Navigate to="/student-login" />
+      ) : user.role === 'admin' ? (
+        <Navigate to="/admin" />
+      ) : (
+        <Navigate to="/student" />
+      )
+    }
+  />
+
+  {/* Student Auth */}
+  <Route path="/student-login" element={<StudentLogin />} />
+  <Route path="/student-register" element={<StudentRegister />} />
+
+  {/* Registrar Auth */}
+  <Route path="/registrar-login" element={<RegistrarLogin />} />
+  <Route path="/registrar-register" element={<RegistrarRegister />} />
+
+  {/* Authenticated pages */}
+  <Route
+    path="/request"
+    element={
+      user && user.role === 'student' ? (
+        <DocumentRequest />
+      ) : (
+        <Navigate to="/student-login" replace />
+      )
+    }
+  />
+  <Route
+    path="/admin"
+    element={
+      user && user.role === 'admin' ? (
+        <RegistrarPortal />
+      ) : (
+        <Navigate to="/registrar-login" replace />
+      )
+    }
+  />
+  <Route
+    path="/student"
+    element={
+      user && user.role === 'student' ? (
+        <StudentPortal />
+      ) : (
+        <Navigate to="/student-login" replace />
+      )
+    }
+  />
+  <Route path="/claim/:id" element={<ClaimSlip />} />
+</Routes>
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  return (
     <Router>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <Header user={user} onLogout={handleLogout} />
-        <main style={{ flex: 1 }}>
-          <Routes>
-            <Route 
-              path="/" 
-              element={
-                !user ? (
-                  showRegister ? (
-                    <Register onBack={() => setShowRegister(false)} />
-                  ) : (
-                    <Login 
-                      onLogin={handleLogin} 
-                      onRegister={() => setShowRegister(true)} 
-                    />
-                  )
-                ) : user.role === 'admin' ? (
-                  <Navigate to="/admin" replace />
-                ) : (
-                  <Navigate to="/request" replace />
-                )
-              } 
-            />
-            <Route 
-              path="/request" 
-              element={user && user.role === 'student' ? <DocumentRequest user={user} /> : <Navigate to="/" replace />} 
-            />
-            <Route 
-              path="/admin" 
-              element={user && user.role === 'admin' ? <AdminPortal /> : <Navigate to="/" replace />} 
-            />
-            <Route 
-              path="/claim/:id" 
-              element={<ClaimSlip />} 
-            />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 }
