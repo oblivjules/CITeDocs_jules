@@ -5,22 +5,30 @@ import './Login.css';
 import logo from '../../../assets/images/app_logo.png';
 import documentIcon from '../../../assets/images/document_icon.png';
 import swapIcon from '../../../assets/images/swap.png';
+import { validateRegistrarLogin } from '../validation/registrarLoginValidation';
 
-export default function Login() {
+export default function RegistrarLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({}); // <-- add this
   const { login, error } = useAuthContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate inputs
+    const validationErrors = validateRegistrarLogin({ email, password });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return; // stop submission
+    }
+    setErrors({}); // clear previous errors
+
     const user = await login(email, password);
     if (user) {
-      if (user.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/student');
-      }
+      if (user.role === 'admin') navigate('/admin');
+      else navigate('/student');
     }
   };
 
@@ -37,8 +45,7 @@ export default function Login() {
           </div>
           <h1 className="welcome-title">WELCOME BACK TO CITEDOCS</h1>
           <p className="welcome-text">
-            Sign in to help students navigate their requests
-and stay informed every step of the way.
+            Sign in to help students navigate their requests and stay informed every step of the way.
           </p>
         </div>
 
@@ -53,9 +60,10 @@ and stay informed every step of the way.
 
             <h2 className="login-title">LOGIN AS REGISTRAR</h2>
 
-            {error && (
-              <div className="alert alert-error">{error}</div>
-            )}
+            {/* Show validation errors */}
+            {error && <div className="alert alert-error">{error}</div>}
+            {errors.email && <div className="alert alert-error">{errors.email}</div>}
+            {errors.password && <div className="alert alert-error">{errors.password}</div>}
 
             <form onSubmit={handleSubmit}>
               <div className="input-group">
@@ -65,7 +73,7 @@ and stay informed every step of the way.
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
+                  className={errors.email ? "error" : ""}
                   placeholder="Enter your email"
                 />
               </div>
@@ -77,7 +85,7 @@ and stay informed every step of the way.
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  className={errors.password ? "error" : ""}
                   placeholder="Enter your password"
                 />
               </div>

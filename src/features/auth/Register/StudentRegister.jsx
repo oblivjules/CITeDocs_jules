@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
 import logo from '../../../assets/images/app_logo.png';
-import swapIcon from '../../../assets/images/swap.png';
+import { validateStudentRegister } from '../validation/studentValidation';
 
-export default function Register() {
+export default function StudentRegister() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -14,7 +14,7 @@ export default function Register() {
     confirmPassword: '',
     agreedToTerms: false
   });
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -22,34 +22,41 @@ export default function Register() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    let newValue = value;
+
+    // Auto-format for registrarId
+    if (name === "registrarId") {
+      const digits = value.replace(/\D/g, ''); // Only numbers
+      if (digits.length <= 2) {
+        newValue = digits;
+      } else if (digits.length <= 6) {
+        newValue = digits.slice(0, 2) + '-' + digits.slice(2);
+      } else if (digits.length <= 9) {
+        newValue = digits.slice(0, 2) + '-' + digits.slice(2, 6) + '-' + digits.slice(6);
+      } else {
+        newValue = digits.slice(0, 2) + '-' + digits.slice(2, 6) + '-' + digits.slice(6, 9);
+      }
+    }
+
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : newValue
     });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError('');
 
-    if (!formData.agreedToTerms) {
-      setError('Please agree to the Terms of Service and Privacy Policy');
+    const validationErrors = validateStudentRegister(formData);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
+    setErrors({});
     setSuccess(true);
     setTimeout(() => {
-      navigate('/login');
+      navigate('/student-login');
     }, 2000);
   };
 
@@ -68,19 +75,13 @@ export default function Register() {
           </div>
           <h1 className="register-welcome-title">SIGN UP AS A STUDENT</h1>
           <p className="register-welcome-text">
-            Sign up to access your document requests, <br></br>
+            Sign up to access your document requests, <br />
             track their status, and stay updated.
           </p>
         </div>
 
         <div className="register-form-section">
           <div className="register-card">
-            {error && (
-              <div className="alert alert-error">
-                {error}
-              </div>
-            )}
-
             {success && (
               <div className="alert alert-success">
                 Registration successful! Redirecting to login...
@@ -97,9 +98,9 @@ export default function Register() {
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
-                    required
                     placeholder="Enter first name"
                   />
+                  {errors.firstName && <span className="field-error">{errors.firstName}</span>}
                 </div>
 
                 <div className="input-group">
@@ -110,9 +111,9 @@ export default function Register() {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
-                    required
                     placeholder="Enter last name"
                   />
+                  {errors.lastName && <span className="field-error">{errors.lastName}</span>}
                 </div>
               </div>
 
@@ -124,9 +125,10 @@ export default function Register() {
                   name="registrarId"
                   value={formData.registrarId}
                   onChange={handleChange}
-                  required
                   placeholder="XX-XXXX-XXX"
+                  maxLength={11} // To limit typing beyond the format
                 />
+                {errors.registrarId && <span className="field-error">{errors.registrarId}</span>}
               </div>
 
               <div className="input-group">
@@ -137,9 +139,9 @@ export default function Register() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  required
                   placeholder="Enter your email"
                 />
+                {errors.email && <span className="field-error">{errors.email}</span>}
               </div>
 
               <div className="input-group">
@@ -151,7 +153,6 @@ export default function Register() {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    required
                     placeholder="Create password"
                   />
                   <button
@@ -159,21 +160,10 @@ export default function Register() {
                     className="password-toggle"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      {showPassword ? (
-                        <>
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </>
-                      ) : (
-                        <>
-                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                          <line x1="1" y1="1" x2="23" y2="23"></line>
-                        </>
-                      )}
-                    </svg>
+                    {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
+                {errors.password && <span className="field-error">{errors.password}</span>}
               </div>
 
               <div className="input-group">
@@ -185,7 +175,6 @@ export default function Register() {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    required
                     placeholder="Confirm password"
                   />
                   <button
@@ -193,21 +182,10 @@ export default function Register() {
                     className="password-toggle"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      {showConfirmPassword ? (
-                        <>
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                          <circle cx="12" cy="12" r="3"></circle>
-                        </>
-                      ) : (
-                        <>
-                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                          <line x1="1" y1="1" x2="23" y2="23"></line>
-                        </>
-                      )}
-                    </svg>
+                    {showConfirmPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
+                {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
               </div>
 
               <div className="terms-checkbox">
@@ -221,6 +199,7 @@ export default function Register() {
                 <label htmlFor="agreedToTerms">
                   I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>
                 </label>
+                {errors.agreedToTerms && <span className="field-error">{errors.agreedToTerms}</span>}
               </div>
 
               <button type="submit" className="btn btn-primary btn-signup">
