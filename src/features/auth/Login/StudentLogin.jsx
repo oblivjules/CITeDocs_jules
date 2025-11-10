@@ -5,22 +5,30 @@ import './Login.css';
 import logo from '../../../assets/images/app_logo.png';
 import documentIcon from '../../../assets/images/document_icon.png';
 import swapIcon from '../../../assets/images/swap.png';
+import { validateStudentLogin } from '../validation/studentLoginValidation';
 
-export default function Login() {
+export default function StudentLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({}); 
   const { login, error } = useAuthContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate inputs
+    const validationErrors = validateStudentLogin({ email, password });
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors({}); // clear previous errors
+
     const user = await login(email, password);
     if (user) {
-      if (user.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/student');
-      }
+      if (user.role === 'admin') navigate('/admin');
+      else navigate('/student');
     }
   };
 
@@ -37,9 +45,7 @@ export default function Login() {
           </div>
           <h1 className="welcome-title">WELCOME BACK TO CITEDOCS</h1>
           <p className="welcome-text">
-            Sign in to access your document requests,
-            track their status, and stay updated on any
-            new notifications.
+            Sign in to access your document requests, track their status, and stay updated on any new notifications.
           </p>
         </div>
 
@@ -54,9 +60,10 @@ export default function Login() {
 
             <h2 className="login-title">LOGIN AS STUDENT</h2>
 
-            {error && (
-              <div className="alert alert-error">{error}</div>
-            )}
+            {/* Show validation errors */}
+            {error && <div className="alert alert-error">{error}</div>}
+            {errors.email && <div className="alert alert-error">{errors.email}</div>}
+            {errors.password && <div className="alert alert-error">{errors.password}</div>}
 
             <form onSubmit={handleSubmit}>
               <div className="input-group">
@@ -66,7 +73,7 @@ export default function Login() {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required
+                  className={errors.email ? "error" : ""}
                   placeholder="Enter your email"
                 />
               </div>
@@ -78,7 +85,7 @@ export default function Login() {
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  className={errors.password ? "error" : ""}
                   placeholder="Enter your password"
                 />
               </div>

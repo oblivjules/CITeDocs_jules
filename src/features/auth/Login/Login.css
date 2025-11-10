@@ -242,4 +242,18 @@ html, body {
     width: 160px;
     height: 160px;
   }
+
+  /* Inline field validation error for login form */
+.input-group input.error {
+  border-color: #dc2626;       /* red border for invalid input */
+  background-color: #fef2f2;   /* light red background */
+}
+
+.input-group .error-message {
+  color: #991b1b;              /* dark red text */
+  font-size: 12px;             /* smaller than input text */
+  margin-top: 4px;             /* spacing below input */
+  display: block;              /* ensures it appears below input */
+}
+
 }
