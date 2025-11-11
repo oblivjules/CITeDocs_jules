@@ -1,39 +1,36 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import './ClaimSlip.css';
+import React from "react";
+import "./ClaimSlip.css";
+import { Link } from "react-router-dom";
+import CITLogo from '../../../assets/images/CIT_logo.png';
 
-export default function ClaimSlip() {
-  const { id } = useParams();
-
-  const claimData = {
-    id: id,
-    claimNumber: `CLAIM-${id}-${Date.now()}`,
-    studentName: 'John Doe',
-    studentId: '2024-001',
-    documentType: 'Transcript of Records',
-    copies: 2,
-    totalPrice: 300,
-    dateRequested: '2024-01-15',
-    dateReady: new Date().toLocaleDateString(),
-    claimLocation: 'Registrar Office, Room 101',
-    claimHours: 'Monday-Friday, 8:00 AM - 5:00 PM'
-  };
-
+const ClaimSlip = () => {
   const handlePrint = () => {
     window.print();
   };
 
+  // Example dynamic data — you can replace with props or API data
+  const claimData = {
+    claimNumber: "CLAIM-REQ-2025-002-1762836824669",
+    dateReady: "11/11/2025",
+    studentName: "John Doe",
+    studentId: "20-2423-001",
+    documentType: "Transcript of Records",
+    copies: 2,
+  };
+
   return (
     <div className="claim-slip-container">
-      <div className="claim-slip-card card">
+      <div className="claim-slip-card">
+        {/* Header */}
         <div className="claim-header">
-          <div className="claim-icon">✓</div>
-          <h1>Document Claim Slip</h1>
-          <h2>CITeDocs</h2>
+          <img src={CITLogo} alt="CIT-U Seal" className="citu-seal" />
+          <h1>CLAIM SLIP</h1>
+          <h2>Official Document Release</h2>
         </div>
 
         <div className="divider"></div>
 
+        {/* Claim Info */}
         <div className="claim-info-grid">
           <div className="info-item">
             <span className="info-label">Claim Number</span>
@@ -47,6 +44,7 @@ export default function ClaimSlip() {
 
         <div className="divider"></div>
 
+        {/* Student Information */}
         <h3>Student Information</h3>
         <div className="claim-info-grid">
           <div className="info-item">
@@ -59,9 +57,12 @@ export default function ClaimSlip() {
           </div>
         </div>
 
+        <div className="divider"></div>
+
+        {/* Document Details */}
         <h3>Document Details</h3>
         <div className="claim-info-grid">
-          <div className="info-item full-width">
+          <div className="info-item">
             <span className="info-label">Document Type</span>
             <span className="info-value">{claimData.documentType}</span>
           </div>
@@ -69,37 +70,35 @@ export default function ClaimSlip() {
             <span className="info-label">Number of Copies</span>
             <span className="info-value">{claimData.copies}</span>
           </div>
-          <div className="info-item">
-            <span className="info-label">Total Amount</span>
-            <span className="info-value price">₱{claimData.totalPrice}</span>
-          </div>
         </div>
 
         <div className="divider"></div>
 
-        <h3>Claim Instructions</h3>
+        {/* Instructions */}
         <div className="instructions-box">
-          <p><strong>Location:</strong> {claimData.claimLocation}</p>
-          <p><strong>Office Hours:</strong> {claimData.claimHours}</p>
-          <p><strong>Requirements:</strong></p>
+          <p>
+            Please present this slip to the Registrar’s Office to claim your
+            document.
+          </p>
           <ul>
-            <li>Valid School ID or Government-issued ID</li>
-            <li>This claim slip (printed or digital)</li>
-            <li>Payment receipt (if not yet paid)</li>
+            <li>Bring a valid school ID.</li>
+            <li>Ensure your payment has been verified.</li>
+            <li>Only the requester can claim the document.</li>
           </ul>
         </div>
 
-        <div className="print-button-container no-print">
-          <button className="btn btn-primary" onClick={handlePrint}>
-            🖨️ Print Claim Slip
-          </button>
-        </div>
-
+        {/* Footer */}
         <div className="claim-footer">
-          <p>Please present this claim slip when picking up your documents.</p>
-          <p>For inquiries, contact the Registrar Office at registrar@cit.edu</p>
+          <p>© 2025 CIT-U Registrar’s Office | CITeDocs</p>
         </div>
       </div>
+
+      {/* Floating Print Button */}
+      <button className="floating-print-btn no-print" onClick={handlePrint}>
+        🖨️ Print Claim Slip
+      </button>
     </div>
   );
-}
+};
+
+export default ClaimSlip;

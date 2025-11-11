@@ -38,7 +38,7 @@ const initialRequests = [
   },
 ];
 
-export default function AdminPortal() {
+export default function RegistrarPortal() {
   const [requests, setRequests] = useState(initialRequests);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -76,7 +76,7 @@ export default function AdminPortal() {
     <div className="admin-portal-container">
       <div className="admin-header">
         <span className="admin-icon">📊</span>
-        <h1>Admin Portal</h1>
+        <h1>Registrar Portal</h1>
       </div>
 
       <div className="stats-grid">

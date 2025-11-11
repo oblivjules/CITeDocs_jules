@@ -4,7 +4,7 @@ import './Register.css';
 import logo from '../../../assets/images/app_logo.png';
 import { validateRegistrarRegister } from '../validation/registrarValidation';
 
-export default function Register() {
+export default function RegistrarRegister() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',

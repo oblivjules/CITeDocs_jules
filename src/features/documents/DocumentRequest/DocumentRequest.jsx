@@ -1,179 +1,333 @@
-import React, { useState } from 'react';
-import './DocumentRequest.css';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import "../StudentPortal/StudentPortal.css"; 
+import Header from "../StudentPortal/components/Header"; 
+import Footer from "../../../components/layout/Footer";
+import "./DocumentRequest.css";
 
 const documentTypes = [
-  { value: 'transcript', label: 'Transcript of Records', price: 150 },
-  { value: 'diploma', label: 'Diploma', price: 200 },
-  { value: 'good-moral', label: 'Certificate of Good Moral', price: 50 },
-  { value: 'enrollment', label: 'Certificate of Enrollment', price: 50 },
-  { value: 'grades', label: 'Certificate of Grades', price: 100 },
+  { value: "transcript", label: "Transcript of Records" },
+  { value: "diploma", label: "Diploma" },
+  { value: "good-moral", label: "Certificate of Good Moral" },
+  { value: "enrollment", label: "Certificate of Enrollment" },
+  { value: "grades", label: "True Copy of Grades" },
 ];
 
-export default function DocumentRequest({ user }) {
+export default function DocumentRequest() {
   const [formData, setFormData] = useState({
-    documentType: '',
-    purpose: '',
+    studentId: "20-2423-001",
+    studentName: "John Doe",
+    documentType: "",
+    dateNeeded: "",
     copies: 1,
-    notes: ''
+    proofFile: null,
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [requests, setRequests] = useState([]);
+
+  // ✅ Placeholder requests (like Django history)
+  const [userRequests, setUserRequests] = useState([
+    {
+      id: "REQ-2025-001",
+      documentLabel: "Transcript of Records",
+      copies: 2,
+      dateNeeded: "Nov 15, 2025",
+      status: "Processing",
+      proofUrl: "https://via.placeholder.com/300x200.png?text=Proof+of+Payment",
+    },
+    {
+      id: "REQ-2025-002",
+      documentLabel: "Certificate of Enrollment",
+      copies: 1,
+      dateNeeded: "Nov 10, 2025",
+      status: "Approved",
+      proofUrl: "https://via.placeholder.com/300x200.png?text=Proof+of+Payment",
+    },
+    {
+      id: "REQ-2025-003",
+      documentLabel: "Good Moral Character",
+      copies: 1,
+      dateNeeded: "Nov 5, 2025",
+      status: "Completed",
+      proofUrl: "https://via.placeholder.com/300x200.png?text=Proof+of+Payment",
+    },
+  ]);
+
+  const [success, setSuccess] = useState(false);
+  const [proofModal, setProofModal] = useState({ visible: false, imgUrl: "" });
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, proofFile: file });
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    const selectedDoc = documentTypes.find(doc => doc.value === formData.documentType);
-    const totalPrice = selectedDoc.price * formData.copies;
-    
+
     const newRequest = {
-      id: Date.now(),
-      ...formData,
-      documentLabel: selectedDoc.label,
-      totalPrice,
-      status: 'pending',
-      date: new Date().toLocaleDateString(),
-      studentName: user.name,
-      studentId: user.studentId
+      id: `REQ-${Date.now().toString().slice(-4)}`,
+      documentLabel:
+        documentTypes.find((doc) => doc.value === formData.documentType)
+          ?.label || "",
+      copies: formData.copies,
+      dateNeeded: formData.dateNeeded,
+      status: "Pending",
+      proofUrl: formData.proofFile
+        ? URL.createObjectURL(formData.proofFile)
+        : "",
     };
 
-    setRequests([newRequest, ...requests]);
-    setSubmitted(true);
-    
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        documentType: '',
-        purpose: '',
-        copies: 1,
-        notes: ''
-      });
-    }, 3000);
+    setUserRequests([newRequest, ...userRequests]);
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 3000);
+
+    // reset form
+    setFormData({
+      ...formData,
+      documentType: "",
+      dateNeeded: "",
+      copies: 1,
+      proofFile: null,
+    });
   };
 
-  const selectedDoc = documentTypes.find(doc => doc.value === formData.documentType);
-  const totalPrice = selectedDoc ? selectedDoc.price * formData.copies : 0;
+  const openProofModal = (imgUrl) => {
+    setProofModal({ visible: true, imgUrl });
+  };
+
+  const closeProofModal = () => {
+    setProofModal({ visible: false, imgUrl: "" });
+  };
 
   return (
-    <div className="document-request-container">
-      <div className="document-request-grid">
-        <div className="request-form-section">
-          <div className="card">
-            <div className="section-header">
-              <span className="section-icon">📄</span>
-              <h2>Request Document</h2>
+    <div className="portal-container">
+      {/* ✅ Reuse the consistent portal header */}
+      <Header studentName="John Doe" />
+
+      <div className="request-container">
+        <div className="form-card">
+          <div className="form-header">
+            <div className="form-icon">📄</div>
+            <div>
+              <h2>Request a New Document</h2>
+              <p>
+                Please fill out the form to request a document from the
+                Registrar's Office.
+              </p>
             </div>
-
-            {submitted && (
-              <div className="alert alert-success">
-                Request submitted successfully! You will receive a notification once processed.
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit}>
-              <div className="input-group">
-                <label htmlFor="documentType">Document Type</label>
-                <select
-                  id="documentType"
-                  name="documentType"
-                  value={formData.documentType}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select a document</option>
-                  {documentTypes.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label} - ₱{option.price}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="purpose">Purpose</label>
-                <input
-                  type="text"
-                  id="purpose"
-                  name="purpose"
-                  value={formData.purpose}
-                  onChange={handleChange}
-                  required
-                  placeholder="e.g., Job Application, Transfer"
-                />
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="copies">Number of Copies</label>
-                <input
-                  type="number"
-                  id="copies"
-                  name="copies"
-                  value={formData.copies}
-                  onChange={handleChange}
-                  required
-                  min="1"
-                  max="10"
-                />
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="notes">Additional Notes</label>
-                <textarea
-                  id="notes"
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleChange}
-                  rows="3"
-                  placeholder="Any special instructions..."
-                />
-              </div>
-
-              {selectedDoc && (
-                <div className="total-price">
-                  <strong>Total: ₱{totalPrice}</strong>
-                </div>
-              )}
-
-              <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                Submit Request
-              </button>
-            </form>
           </div>
-        </div>
 
-        <div className="requests-list-section">
-          <h2>My Requests</h2>
-          
-          {requests.length === 0 ? (
-            <div className="card empty-state">
-              <p>No requests yet. Submit your first document request!</p>
-            </div>
-          ) : (
-            <div className="requests-list">
-              {requests.map((request) => (
-                <div key={request.id} className="card request-item">
-                  <div className="request-header">
-                    <h3>{request.documentLabel}</h3>
-                    <span className="badge badge-pending">{request.status}</span>
-                  </div>
-                  <div className="request-details">
-                    <p><strong>Purpose:</strong> {request.purpose}</p>
-                    <p><strong>Copies:</strong> {request.copies}</p>
-                    <p><strong>Total:</strong> ₱{request.totalPrice}</p>
-                    <p className="request-date">Submitted: {request.date}</p>
-                  </div>
-                </div>
-              ))}
+          {success && (
+            <div className="alert alert-success">
+              Request submitted successfully!
             </div>
           )}
+
+          <form onSubmit={handleSubmit} className="form-grid">
+            <div className="form-group">
+              <label>Student ID</label>
+              <input
+                type="text"
+                name="studentId"
+                value={formData.studentId}
+                readOnly
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Student Name</label>
+              <input
+                type="text"
+                name="studentName"
+                value={formData.studentName}
+                readOnly
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Document Type</label>
+              <select
+                name="documentType"
+                value={formData.documentType}
+                onChange={handleChange}
+                required
+              >
+                <option value="">-- Select Document Type --</option>
+                {documentTypes.map((doc) => (
+                  <option key={doc.value} value={doc.value}>
+                    {doc.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Date Needed</label>
+              <input
+                type="date"
+                name="dateNeeded"
+                value={formData.dateNeeded}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Number of Copies</label>
+              <input
+                type="number"
+                name="copies"
+                min="1"
+                value={formData.copies}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            {/* ✅ Single styled upload input */}
+            <div className="file-upload">
+              <div className="upload-icon">📤</div>
+              <p className="upload-title">Proof of Payment Upload</p>
+              <p className="upload-subtitle">
+                Upload your payment receipt here
+              </p>
+              <input
+                type="file"
+                id="proofFile"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+              />
+              <label htmlFor="proofFile" className="file-label">
+                {formData.proofFile
+                  ? `📎 ${formData.proofFile.name}`
+                  : "Choose File"}
+              </label>
+              <p className="upload-info">
+                Supported formats: PNG, JPG, JPEG, WEBP
+              </p>
+            </div>
+
+            <div className="submit-btn">
+              <button type="submit" className="btn btn-primary">
+                Submit Request
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* ✅ Request History Table */}
+        <div className="history-card">
+          <div className="history-header">
+            <h3>Request History</h3>
+          </div>
+          <div className="history-table-wrapper">
+            {userRequests.length === 0 ? (
+              <p className="empty-state">No requests found.</p>
+            ) : (
+              <table className="history-table">
+                <thead>
+                  <tr>
+                    <th>REQUEST ID</th>
+                    <th>DOCUMENT</th>
+                    <th>COPIES</th>
+                    <th>DATE NEEDED</th>
+                    <th>STATUS</th>
+                    <th>PAYMENT</th>
+                    <th>CLAIM SLIP</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {userRequests.map((req) => (
+                    <tr key={req.id}>
+                      <td>{req.id}</td>
+                      <td>{req.documentLabel}</td>
+                      <td>{req.copies}</td>
+                      <td>{req.dateNeeded}</td>
+                      <td>
+                        <span
+                          className={`status-badge ${
+                            req.status === "Processing"
+                              ? "status-processing"
+                              : req.status === "Approved"
+                              ? "status-ready"
+                              : req.status === "Completed"
+                              ? "status-completed"
+                              : "status-pending-payment"
+                          }`}
+                        >
+                          {req.status}
+                        </span>
+                      </td>
+
+                      {/* ✅ Payment Column */}
+                      <td>
+                        {req.proofUrl ? (
+                          <button
+                            className="view-proof-btn"
+                            onClick={() => openProofModal(req.proofUrl)}
+                          >
+                            🔍 View Proof
+                          </button>
+                        ) : (
+                          <span style={{ color: "#999" }}>No Payment</span>
+                        )}
+                      </td>
+
+                      {/* ✅ Claim Slip Column */}
+                      <td>
+                        {req.status === "Approved" ||
+                        req.status === "Completed" ? (
+                          <Link
+                            to={`/claim/${req.id}`}
+                            className="action-btn claim-slip-btn"
+                          >
+                            Claim Slip
+                          </Link>
+                        ) : (
+                          <span style={{ color: "#999" }}>Not Available</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* ✅ Proof Modal */}
+      {proofModal.visible && (
+        <div className="modal-overlay" onClick={closeProofModal}>
+          <div
+            className="modal-container"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="modal-close" onClick={closeProofModal}>
+              ✕
+            </button>
+            <img
+              src={proofModal.imgUrl}
+              alt="Proof of Payment"
+              style={{
+                width: "100%",
+                maxHeight: "80vh",
+                objectFit: "contain",
+                borderRadius: "12px",
+              }}
+            />
+          </div>
+        </div>
+      )}
+      <Footer />
     </div>
   );
 }
