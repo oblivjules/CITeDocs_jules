@@ -61,41 +61,6 @@ const RequestDetailsModal = ({ request, onClose }) => {
               <p className="modal-value">{request.lastUpdated || "Today"}</p>
             </div>
           </div>
-
-          {request.status === "Pending Payment" && (
-            <div className="proof-of-payment">
-              <div className="proof-header">
-                <span className="proof-icon">📥</span>
-                <span>Proof of Payment</span>
-              </div>
-              <div className="upload-area">
-                <div className="upload-placeholder">
-                  {selectedFile ? (
-                    <div className="file-selected">
-                      <p>✓ {selectedFile.name}</p>
-                      <button className="upload-btn" onClick={handleUpload}>
-                        Upload Receipt
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <p className="upload-text">Payment receipt image</p>
-                      <input 
-                        type="file" 
-                        id="file-upload"
-                        accept="image/*"
-                        onChange={handleFileSelect}
-                        style={{ display: 'none' }}
-                      />
-                      <label htmlFor="file-upload" className="upload-btn">
-                        Choose File
-                      </label>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </>

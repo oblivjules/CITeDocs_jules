@@ -7,12 +7,12 @@ export default function useAuth() {
 
   const login = (email, password) => {
     setError(null);
-    if (email === 'admin@cit.edu' && password === 'admin123') {
-      const adminUser = new User('1', 'Admin User', email, 'admin');
+    if (email === 'registrar@cit.edu' && password === '12345') {
+      const adminUser = new User('1', 'Registrar User', email, 'registrar');
       setUser(adminUser);
       return adminUser;
-    } else if (email === 'student@cit.edu' && password === 'student123') {
-      const studentUser = new User('2', 'John Doe', email, 'student', '2024-001');
+    } else if (email === 'student@cit.edu' && password === '12345') {
+      const studentUser = new User('2', 'John Doe', email, 'student', '20-2423-001');
       setUser(studentUser);
       return studentUser;
     } else {

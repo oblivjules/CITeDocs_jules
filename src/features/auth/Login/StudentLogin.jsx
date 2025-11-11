@@ -14,23 +14,20 @@ export default function StudentLogin() {
   const { login, error } = useAuthContext();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    // Validate inputs
-    const validationErrors = validateStudentLogin({ email, password });
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-    setErrors({}); // clear previous errors
+  const validationErrors = validateStudentLogin({ email, password });
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
 
-    const user = await login(email, password);
-    if (user) {
-      if (user.role === 'admin') navigate('/admin');
-      else navigate('/student');
-    }
-  };
+  setErrors({});
+  const user = await login(email, password, "student"); // ✅ role check
+
+  if (user) navigate("/student");
+};
 
   return (
     <div className="login-page">

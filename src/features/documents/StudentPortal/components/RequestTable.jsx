@@ -1,12 +1,13 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const RequestTable = ({ requests, onViewDetails }) => {
   const getStatusClass = (status) => {
     const statusMap = {
-      "Processing": "status-processing",
-      "Ready for Pickup": "status-ready",
-      "Pending Payment": "status-pending-payment",
-      "Completed": "status-completed"
+      Processing: "status-processing",
+      Approved: "status-ready",
+      Pending: "status-pending-payment",
+      Completed: "status-completed",
     };
     return statusMap[status] || "status-default";
   };
@@ -25,26 +26,45 @@ const RequestTable = ({ requests, onViewDetails }) => {
           </tr>
         </thead>
         <tbody>
-          {requests.map((r) => (
-            <tr key={r.id}>
-              <td>{r.id}</td>
-              <td>{r.type}</td>
-              <td>{r.date}</td>
-              <td>
-                <span className={`status-badge ${getStatusClass(r.status)}`}>
-                  {r.status}
-                </span>
-              </td>
-              <td>
-                <button 
-                  className="action-btn"
-                  onClick={() => onViewDetails(r)}
-                >
-                  View Details ›
-                </button>
+          {requests.length > 0 ? (
+            requests.map((r) => (
+              <tr key={r.id}>
+                <td>{r.id}</td>
+                <td>{r.type}</td>
+                <td>{r.date}</td>
+                <td>
+                  <span className={`status-badge ${getStatusClass(r.status)}`}>
+                    {r.status}
+                  </span>
+                </td>
+                <td className="action-cell">
+                  {/* View Details Button */}
+                  <button
+                    className="action-btn"
+                    onClick={() => onViewDetails(r)}
+                  >
+                    View Details ›
+                  </button>
+
+                  {/* Claim Slip Button — appears only when approved or completed */}
+                  {(r.status === "Approved" || r.status === "Completed") && (
+                    <Link
+                      to={`/claim/${r.id}`} // ✅ dynamic route
+                      className="action-btn claim-slip-btn"
+                    >
+                      Claim Slip
+                    </Link>
+                  )}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="empty-row">
+                No requests found.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
