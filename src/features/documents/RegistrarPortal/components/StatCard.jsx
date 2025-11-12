@@ -14,4 +14,6 @@ export default function StatCard({ label, value, color, link }) {
       <p className={`stat-number ${color}`}>{value}</p>
     </div>
   );
+
+  
 }
