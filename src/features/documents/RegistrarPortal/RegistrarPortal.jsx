@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "./components/Header";
 import StatCard from "./components/StatCard";
 import RequestsList from "./pages/RequestsList";
 import "./RegistrarPortal.css";
 
 export default function RegistrarPortal() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
   const [requests, setRequests] = useState([
     {
       id: 1,
@@ -60,31 +64,76 @@ export default function RegistrarPortal() {
     );
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    navigate("/registrar-login", { replace: true });
+  };
+
   const stats = {
     total: requests.length,
     processing: requests.filter((r) => r.status === "processing").length,
     approved: requests.filter((r) => r.status === "approved").length,
     ready: requests.filter((r) => r.status === "ready").length,
-    rejected: requests.filter(r => r.status === "rejected").length,
+    rejected: requests.filter((r) => r.status === "rejected").length,
   };
+
+  // Current filter from query string
+  const currentFilter = searchParams.get("status") || "all";
+
+  // Filtered requests based on StatCard click
+  const filteredRequests =
+    currentFilter === "all"
+      ? requests
+      : requests.filter((r) => r.status === currentFilter);
 
   return (
     <div className="admin-portal-container">
-      <Header title="Registrar Portal" />
+      <Header title="Registrar Portal" onLogout={handleLogout} />
 
       <div className="stats-grid">
-        <StatCard label="Total Requests" value={stats.total} color="stat-total" link="/all" />
-        <StatCard label="Processing" value={stats.processing} color="stat-warning" link="/processing" />
-        <StatCard label="Approved" value={stats.approved} color="stat-info" link="/approved" />
-        <StatCard label="Ready for Pickup" value={stats.ready} color="stat-success" link="/ready" />
+        <StatCard
+          label="Total Requests"
+          value={stats.total}
+          color="stat-total"
+          link="/registrar?status=all"
+        />
+        <StatCard
+          label="Processing"
+          value={stats.processing}
+          color="stat-warning"
+          link="/registrar?status=processing"
+        />
+        <StatCard
+          label="Approved"
+          value={stats.approved}
+          color="stat-info"
+          link="/registrar?status=approved"
+        />
+        <StatCard
+          label="Ready for Pickup"
+          value={stats.ready}
+          color="stat-success"
+          link="/registrar?status=ready"
+        />
+        <StatCard
+          label="Rejected"
+          value={stats.rejected}
+          color="stat-danger"
+          link="/registrar?status=rejected"
+        />
       </div>
 
-      {/* 🧾 Scrollable section for requests */}
+      {/* Scrollable requests table */}
       <div className="scrollable-section">
-        <RequestsList requests={requests} onStatusChange={handleStatusChange} />
+        <h2 style={{ marginBottom: "16px", textTransform: "capitalize" }}>
+          {currentFilter} Requests
+        </h2>
+        <RequestsList requests={filteredRequests} onStatusChange={handleStatusChange} />
       </div>
 
-      <footer className="admin-footer">© 2025 Registrar Portal. All rights reserved.</footer>
+      <footer className="admin-footer">
+        © 2025 Registrar Portal. All rights reserved.
+      </footer>
     </div>
   );
 }
