@@ -20,6 +20,11 @@ const ClaimSlip = () => {
 
   return (
     <div className="claim-slip-container">
+       {/* Back Button */}
+    <Link to={-1} className="back-btn no-print">
+      ← Back
+    </Link>
+    
       <div className="claim-slip-card">
         {/* Header */}
         <div className="claim-header">

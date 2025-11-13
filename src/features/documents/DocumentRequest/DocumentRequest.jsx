@@ -274,7 +274,7 @@ export default function DocumentRequest() {
                             className="view-proof-btn"
                             onClick={() => openProofModal(req.proofUrl)}
                           >
-                            🔍 View Proof
+                            View Proof
                           </button>
                         ) : (
                           <span style={{ color: "#999" }}>No Payment</span>
