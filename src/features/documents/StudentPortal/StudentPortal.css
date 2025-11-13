@@ -88,8 +88,33 @@
 
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  transition: 0.25s ease;
 }
+
+.stat-card.stat-yellow:hover {
+  background-color: #FDB714 !important; /* keep exact yellow */
+  border-top-color: #E5A800 !important; 
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* subtle neutral shadow */
+}
+
+.stat-card.stat-light:hover,
+.stat-card.stat-total:hover,
+.stat-card.stat-info:hover,
+.stat-card.stat-success:hover,
+.stat-card.stat-white:hover {
+  box-shadow: 0 8px 20px rgba(253, 183, 20, 0.35);
+  border-top-color: #FDB714;
+  background-color: #fffbea;
+}
+
+.stat-card.stat-primary:hover,
+.stat-card.stat-danger:hover {
+  box-shadow: 0 8px 20px rgba(253, 183, 20, 0.25);
+  border-top-color: #FDB714;
+  background-color: #8B2635; /* keep same red */
+}
+
 
 .stat-card-layout {
   display: flex;
