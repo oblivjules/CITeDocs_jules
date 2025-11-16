@@ -1,8 +1,20 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import ProofModal from "../../../../components/common/ProofModal";
 
 export default function RequestTable({ requests, onView }) {
-  const [proofImage, setProofImage] = useState(null); // store selected proof image
+  const [proofModal, setProofModal] = useState({
+    visible: false,
+    imgUrl: "",
+  });
+
+  const openProofModal = (imgUrl) => {
+    setProofModal({ visible: true, imgUrl });
+  };
+
+  const closeProofModal = () => {
+    setProofModal({ visible: false, imgUrl: "" });
+  };
 
   const getStatusBadgeClass = (status) => {
     switch (status.toLowerCase()) {
@@ -27,8 +39,8 @@ export default function RequestTable({ requests, onView }) {
         <table className="table">
           <thead>
             <tr>
-              <th>Student ID</th>
-              <th>Student Name</th>
+              <th>Request ID</th>
+              <th>Student Info</th>
               <th>Document Type</th>
               <th>Copies</th>
               <th>Date</th>
@@ -40,59 +52,71 @@ export default function RequestTable({ requests, onView }) {
 
           <tbody>
             {requests.length > 0 ? (
-              requests.map((req) => (
-                <tr key={req.id}>
-                  <td>{req.studentId}</td>
-                  <td>{req.studentName}</td>
-                  <td>{req.documentType}</td>
-                  <td>{req.copies}</td>
-                  <td>{req.date}</td>
+              requests.map((req) => {
+                const status = req.status.toLowerCase();
+                const hideUpdate =
+                  status === "completed" || status === "rejected";
 
-                  {/* ✅ Proof Image column with button */}
-                  <td>
-                    {req.proofImage ? (
-                      <button
-                        className="btn-small proof-btn"
-                        onClick={() => setProofImage(req.proofImage)}
-                      >
-                        View Proof
-                      </button>
-                    ) : (
-                      <em style={{ color: "#888" }}>No proof</em>
-                    )}
-                  </td>
+                return (
+                  <tr key={req.id}>
+                    <td>{req.id}</td>
 
-                  <td>
-                    <span className={`badge ${getStatusBadgeClass(req.status)}`}>
-                      {req.status.toUpperCase()}
-                    </span>
-                  </td>
+                    <td>
+                      <strong>{req.studentName}</strong>
+                      <br />
+                      <span style={{ fontSize: "0.85rem", color: "#666" }}>
+                        {req.studentId}
+                      </span>
+                    </td>
 
-                  {/* ✅ Actions */}
-                  <td>
-                    <div className="action-buttons">
-                      {/* View Button */}
-                      <button
-                        className="btn-small btn-outline"
-                        onClick={() => onView(req)}
-                      >
-                        Update
-                      </button>
+                    <td>{req.documentType}</td>
+                    <td>{req.copies}</td>
+                    <td>{req.date}</td>
 
-                      {/* Claim Slip button visible for Approved + Ready */}
-                      {(req.status.toLowerCase() === "completed" ||
-                        req.status.toLowerCase() === "approved") && (
-                        <Link
-                          to={`/claim/${req.id}`}
-                          className="btn-small btn-primary"
+                    {/* Proof button now opens shared modal */}
+                    <td>
+                      {req.proofImage ? (
+                        <button
+                          className="btn-small btn-primary proof-btn"
+                          onClick={() => openProofModal(req.proofImage)}
                         >
-                          Claim Slip
-                        </Link>
+                          View Proof
+                        </button>
+                      ) : (
+                        <em style={{ color: "#888" }}>No proof</em>
                       )}
-                    </div>
-                  </td>
-                </tr>
-              ))
+                    </td>
+
+                    <td>
+                      <span className={`badge ${getStatusBadgeClass(req.status)}`}>
+                        {req.status.toUpperCase()}
+                      </span>
+                    </td>
+
+                    <td>
+                      <div className="action-buttons">
+                        {!hideUpdate && (
+                          <button
+                            className="btn-small btn-outline"
+                            onClick={() => onView(req)}
+                          >
+                            Update
+                          </button>
+                        )}
+
+                        {(status === "approved" || status === "completed") && (
+                          <Link
+                            to={`/claim/${req.id}`}
+                            className="action-btn claim-slip-btn"
+                          >
+                            Claim Slip
+                          </Link>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan="8" style={{ textAlign: "center", padding: "1rem" }}>
@@ -104,22 +128,9 @@ export default function RequestTable({ requests, onView }) {
         </table>
       </div>
 
-      {/* ✅ Proof Image Modal */}
-      {proofImage && (
-        <div
-          className="proof-modal-overlay"
-          onClick={() => setProofImage(null)}
-        >
-          <div className="proof-modal" onClick={(e) => e.stopPropagation()}>
-            <img src={proofImage} alt="Proof" className="proof-modal-img" />
-            <button
-              className="close-btn"
-              onClick={() => setProofImage(null)}
-            >
-              ✕
-            </button>
-          </div>
-        </div>
+      {/* Shared ProofModal */}
+      {proofModal.visible && (
+        <ProofModal imgUrl={proofModal.imgUrl} onClose={closeProofModal} />
       )}
     </>
   );

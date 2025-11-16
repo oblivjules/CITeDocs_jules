@@ -10,7 +10,7 @@ const ClaimSlip = () => {
 
   // Example dynamic data — you can replace with props or API data
   const claimData = {
-    claimNumber: "CLAIM-REQ-2025-002-1762836824669",
+    claimNumber: "REQ-2025-002",
     dateReady: "11/11/2025",
     studentName: "John Doe",
     studentId: "20-2423-001",
