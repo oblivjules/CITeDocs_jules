@@ -69,6 +69,17 @@ export default function RegistrarPortal() {
       date: "Dec 19, 2025",
       proofImage: "/proof-test.jpg",
     },
+    {
+      id: "REQ-2025-006",
+      studentName: "V Pa",
+      studentId: "23-2124-005",
+      documentType: "Transcript of Records",
+      purpose: "Internship",
+      copies: 15,
+      status: "pending",
+      date: "Dec 01, 2025",
+      proofImage: "/proof-test.jpg",
+    },
   ]);
 
   const handleStatusChange = (id, newStatus, remarks) => {
@@ -111,7 +122,7 @@ export default function RegistrarPortal() {
     },
     {
       label: "Completed",
-      value: requests.filter((r) => r.status === "ready").length,
+      value: requests.filter((r) => r.status === "completed").length,
       color: "stat-success",
       link: "/registrar?status=ready",
     },
